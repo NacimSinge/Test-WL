@@ -75,6 +75,13 @@
       font-size: 0.95rem;
     }
 
+    .helper {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #cbd5f5;
+      line-height: 1.4;
+    }
+
     input, button, select {
       font: inherit;
       border-radius: 10px;
@@ -267,18 +274,23 @@
       </header>
       <div class="grid two">
         <label>
-          Chaîne Twitch (sans le #)
+          Chaîne Twitch (requis, sans le #)
           <input id="channel" type="text" placeholder="nomdechaine" autocomplete="off" />
         </label>
         <label>
-          Pseudo Twitch du bot
+          Pseudo Twitch du bot (optionnel)
           <input id="username" type="text" placeholder="monbot" autocomplete="off" />
         </label>
         <label>
-          Jeton OAuth (<a href="https://twitchapps.com/tmi/" target="_blank" rel="noreferrer">obtenir un token</a>)
+          Jeton OAuth (optionnel — voir le README pour le générer)
           <input id="token" type="password" placeholder="oauth:xxxxxxxxxxxx" autocomplete="off" />
         </label>
       </div>
+      <p class="helper">
+        Pour une lecture seule du chat, seul le nom de la chaîne est requis. Laissez les champs bot et token vides
+        pour une connexion anonyme fournie par Twitch. Ajoutez un pseudo + un token uniquement si vous avez besoin
+        qu'un bot envoie des messages dans le chat.
+      </p>
       <div style="display:flex; gap:12px; flex-wrap:wrap;">
         <button id="connectBtn">Connexion</button>
         <button id="disconnectBtn" class="secondary">Déconnexion</button>
@@ -398,9 +410,14 @@
       difference: document.getElementById('difference')
     };
 
-    function updateStatus(text, good = false) {
+    function updateStatus(text, variant = 'neutral') {
       selectors.status.textContent = text;
-      selectors.status.style.color = good ? '#34d399' : '#f87171';
+      const colors = {
+        neutral: '#e5e7eb',
+        success: '#34d399',
+        error: '#f87171'
+      };
+      selectors.status.style.color = colors[variant] || colors.neutral;
     }
 
     function connect() {
@@ -408,8 +425,19 @@
       const username = selectors.username.value.trim();
       const token = selectors.token.value.trim();
 
-      if (!channel || !username || !token) {
-        updateStatus('Merci de remplir tous les champs avant de vous connecter.');
+      if (!channel) {
+        updateStatus('Merci d’indiquer le nom de la chaîne Twitch.', 'error');
+        return;
+      }
+
+      const hasUsername = username.length > 0;
+      const hasToken = token.length > 0;
+
+      if (hasUsername !== hasToken) {
+        updateStatus(
+          'Pour une connexion authentifiée, remplissez à la fois le pseudo bot et le jeton OAuth, ou laissez les deux champs vides.',
+          'error'
+        );
         return;
       }
 
@@ -417,15 +445,23 @@
         state.client.disconnect();
       }
 
-      state.client = new tmi.Client({
+      const clientOptions = {
         options: { debug: false },
-        identity: { username, password: token },
+        connection: { secure: true, reconnect: true },
         channels: [channel]
-      });
+      };
+
+      if (hasUsername && hasToken) {
+        clientOptions.identity = { username, password: token };
+      }
+
+      updateStatus('Connexion en cours…');
+
+      state.client = new tmi.Client(clientOptions);
 
       state.client.on('connected', () => {
         state.connected = true;
-        updateStatus(`Connecté au chat de #${channel}`, true);
+        updateStatus(`Connecté au chat de #${channel}`, 'success');
       });
 
       state.client.on('disconnected', () => {
@@ -442,7 +478,7 @@
 
       state.client.connect().catch((err) => {
         console.error(err);
-        updateStatus('Échec de connexion : ' + err.message);
+        updateStatus('Échec de connexion : ' + err.message, 'error');
       });
     }
 

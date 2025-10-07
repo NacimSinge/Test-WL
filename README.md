@@ -15,16 +15,27 @@ Cette mini-application 100% gratuite vous permet de jouer à une version "chat" 
 
 1. **Téléchargez le dépôt** ou copiez simplement le fichier `index.html` sur votre ordinateur de streaming.
 2. **Ouvrez le fichier** dans votre navigateur (clic droit → ouvrir avec Chrome/Edge/Firefox). Pour l'afficher sur OBS, ajoutez-le comme *Browser Source* en pointant vers `file:///…/index.html`.
-3. **Renseignez vos identifiants Twitch** :
-   - *Chaîne Twitch* : le nom de votre chaîne sans le `#`.
-   - *Pseudo Twitch du bot* : votre compte ou un compte bot secondaire.
-   - *Jeton OAuth* :
-     1. Visitez [https://twitchapps.com/tmi/](https://twitchapps.com/tmi/) (site officiel utilisé par la communauté).
-     2. Connectez-vous avec le compte qui enverra les messages.
-     3. Copiez la clé générée (elle commence par `oauth:`) et collez-la dans le champ « Jeton OAuth ».
-4. Cliquez sur **Connexion**. Le statut doit passer au vert (`Connecté au chat`).
+3. **Configurez la connexion au chat** :
+   - *Chaîne Twitch* : le nom de votre chaîne sans le `#` (obligatoire).
+   - *Pseudo Twitch du bot* : laissez vide si vous ne faites que lire le chat. Remplissez-le si vous disposez d’un compte bot dédié.
+   - *Jeton OAuth* : laissez vide pour une connexion anonyme (lecture seule). Si vous renseignez un pseudo bot, ajoutez également son jeton OAuth.
+4. Cliquez sur **Connexion**. Le statut passera en vert (`Connecté au chat`) une fois la connexion établie.
 
-> 💡 Pour plus de sécurité, vous pouvez créer un compte Twitch secondaire dédié au bot.
+> 💡 Pour plus de sécurité, créez un compte Twitch secondaire dédié au bot si vous souhaitez envoyer des messages automatisés.
+
+### Générer un jeton OAuth (optionnel)
+
+L’application peut lire le chat Twitch en mode anonyme, ce qui suffit pour la majorité des usages. Vous n’avez donc pas besoin de token tant que vous n’envoyez pas de messages via le bot.
+
+Si vous voulez tout de même authentifier un compte bot, deux possibilités :
+
+1. **Méthode officielle Twitch** (recommandée par la documentation) :
+   - Créez une application sur <https://dev.twitch.tv/console/apps> et notez le `Client ID` et le `Client Secret`.
+   - Ajoutez `http://localhost` dans la liste des *Redirect URIs*.
+   - Suivez le guide <https://dev.twitch.tv/docs/irc/authenticate-bot/> pour obtenir un token `chat:read chat:edit` et copiez la valeur qui commence par `oauth:`.
+2. **Générateur communautaire maintenu** : <https://twitchtokengenerator.com/quick/tmi> propose une interface simplifiée pour générer un token `chat:read`/`chat:edit`. Connectez-vous avec le compte bot, copiez le token (préfixe `oauth:`) et collez-le dans le champ prévu.
+
+> ℹ️ Quel que soit le procédé utilisé, traitez votre token comme un mot de passe : ne le partagez pas et régénérez-le en cas de doute.
 
 ## Jouer une manche
 
