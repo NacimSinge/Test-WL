@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wavelength Live Twitch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Rubik", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2933, #111827 55%);
+      color: #e5e7eb;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    main {
+      width: min(960px, 100%);
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      margin: 0;
+      text-align: center;
+      color: #facc15;
+      letter-spacing: 0.04em;
+    }
+
+    section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(30, 41, 59, 0.75);
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    section header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    section header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+      color: #bfdbfe;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+
+    input, button, select {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.8);
+      color: inherit;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, button:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    button {
+      cursor: pointer;
+      background: linear-gradient(135deg, #22d3ee, #6366f1);
+      border: none;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    button.secondary {
+      background: rgba(148, 163, 184, 0.2);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: inherit;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .extremes {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      font-size: clamp(1.15rem, 3vw, 1.6rem);
+    }
+
+    .extreme-label {
+      flex: 1;
+      text-align: center;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .gauge {
+      height: 12px;
+      background: rgba(148, 163, 184, 0.15);
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gauge-fill {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #f97316, #facc15);
+      transition: width 0.4s ease;
+    }
+
+    .metrics {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .metric {
+      background: rgba(15, 23, 42, 0.65);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .metric span {
+      display: block;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.6rem;
+      color: #f8fafc;
+      margin-top: 6px;
+    }
+
+    .secret {
+      position: relative;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px dashed rgba(248, 250, 252, 0.4);
+    }
+
+    .secret h3 {
+      margin: 0 0 8px 0;
+      font-size: 1rem;
+      color: #facc15;
+    }
+
+    .secret-value {
+      font-size: 2rem;
+      letter-spacing: 0.12em;
+      color: #fef3c7;
+    }
+
+    .secret-mask {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 12px;
+      border: 1px dashed rgba(248, 250, 252, 0.3);
+      transition: opacity 0.3s ease;
+    }
+
+    .secret-mask.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hidden-text {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(248, 250, 252, 0.7);
+    }
+
+    .log {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    .log-entry {
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .diff {
+      font-size: 2.8rem;
+      font-weight: 600;
+      text-align: center;
+      color: #34d399;
+    }
+
+    .reveal-area {
+      text-align: center;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Wavelength · Édition Twitch</h1>
+
+    <section>
+      <header>
+        <h2>Connexion au chat Twitch</h2>
+      </header>
+      <div class="grid two">
+        <label>
+          Chaîne Twitch (sans le #)
+          <input id="channel" type="text" placeholder="nomdechaine" autocomplete="off" />
+        </label>
+        <label>
+          Pseudo Twitch du bot
+          <input id="username" type="text" placeholder="monbot" autocomplete="off" />
+        </label>
+        <label>
+          Jeton OAuth (<a href="https://twitchapps.com/tmi/" target="_blank" rel="noreferrer">obtenir un token</a>)
+          <input id="token" type="password" placeholder="oauth:xxxxxxxxxxxx" autocomplete="off" />
+        </label>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button id="connectBtn">Connexion</button>
+        <button id="disconnectBtn" class="secondary">Déconnexion</button>
+      </div>
+      <div id="connectionStatus">Non connecté</div>
+    </section>
+
+    <section>
+      <header>
+        <h2>Préparation de la manche</h2>
+      </header>
+      <div class="grid two">
+        <label>
+          Extrême gauche (0)
+          <input id="leftExtreme" type="text" placeholder="Glace" />
+        </label>
+        <label>
+          Extrême droite (100)
+          <input id="rightExtreme" type="text" placeholder="Feu" />
+        </label>
+      </div>
+      <div class="secret">
+        <h3>Valeur cible du tour</h3>
+        <div class="secret-value" id="targetValue">--</div>
+        <div class="secret-mask" id="secretMask">
+          <span class="hidden-text">Caché pour le stream</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button id="generateBtn">Générer une valeur</button>
+        <button id="toggleMaskBtn" class="secondary">Afficher / Masquer</button>
+        <button id="resetRoundBtn" class="secondary">Réinitialiser les votes</button>
+      </div>
+    </section>
+
+    <section>
+      <header>
+        <h2>Votes du chat</h2>
+      </header>
+      <div class="extremes">
+        <div class="extreme-label" id="extremeLeftLabel">Extrême gauche</div>
+        <div style="min-width:120px; text-align:center;">
+          <div class="gauge">
+            <div class="gauge-fill" id="gaugeFill" style="width:0%"></div>
+          </div>
+          <div style="margin-top:10px; font-size:1.4rem;" id="averageValue">--</div>
+        </div>
+        <div class="extreme-label" id="extremeRightLabel">Extrême droite</div>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <span>Nombre de votants uniques</span>
+          <strong id="voterCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>Moyenne en direct</span>
+          <strong id="liveAverage">--</strong>
+        </div>
+        <div class="metric">
+          <span>Dernier vote</span>
+          <strong id="lastVote">--</strong>
+        </div>
+      </div>
+      <div class="log" id="voteLog"></div>
+    </section>
+
+    <section>
+      <header>
+        <h2>Révélation</h2>
+      </header>
+      <div class="reveal-area">
+        <button id="revealBtn">Révéler la cible &amp; l'écart</button>
+        <div class="hidden" id="revealPanel">
+          <div>Valeur moyenne du chat : <strong id="finalAverage">--</strong></div>
+          <div>Valeur cible : <strong id="finalTarget">--</strong></div>
+          <div class="diff">Écart : <span id="difference">--</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/tmi.js@1.8.5/dist/tmi.min.js"></script>
+  <script>
+    const state = {
+      client: null,
+      connected: false,
+      guesses: new Map(),
+      target: null
+    };
+
+    const selectors = {
+      channel: document.getElementById('channel'),
+      username: document.getElementById('username'),
+      token: document.getElementById('token'),
+      connectBtn: document.getElementById('connectBtn'),
+      disconnectBtn: document.getElementById('disconnectBtn'),
+      status: document.getElementById('connectionStatus'),
+      leftExtreme: document.getElementById('leftExtreme'),
+      rightExtreme: document.getElementById('rightExtreme'),
+      extremeLeftLabel: document.getElementById('extremeLeftLabel'),
+      extremeRightLabel: document.getElementById('extremeRightLabel'),
+      generateBtn: document.getElementById('generateBtn'),
+      toggleMaskBtn: document.getElementById('toggleMaskBtn'),
+      resetRoundBtn: document.getElementById('resetRoundBtn'),
+      targetValue: document.getElementById('targetValue'),
+      secretMask: document.getElementById('secretMask'),
+      gaugeFill: document.getElementById('gaugeFill'),
+      averageValue: document.getElementById('averageValue'),
+      voterCount: document.getElementById('voterCount'),
+      liveAverage: document.getElementById('liveAverage'),
+      lastVote: document.getElementById('lastVote'),
+      voteLog: document.getElementById('voteLog'),
+      revealBtn: document.getElementById('revealBtn'),
+      revealPanel: document.getElementById('revealPanel'),
+      finalAverage: document.getElementById('finalAverage'),
+      finalTarget: document.getElementById('finalTarget'),
+      difference: document.getElementById('difference')
+    };
+
+    function updateStatus(text, good = false) {
+      selectors.status.textContent = text;
+      selectors.status.style.color = good ? '#34d399' : '#f87171';
+    }
+
+    function connect() {
+      const channel = selectors.channel.value.trim();
+      const username = selectors.username.value.trim();
+      const token = selectors.token.value.trim();
+
+      if (!channel || !username || !token) {
+        updateStatus('Merci de remplir tous les champs avant de vous connecter.');
+        return;
+      }
+
+      if (state.client) {
+        state.client.disconnect();
+      }
+
+      state.client = new tmi.Client({
+        options: { debug: false },
+        identity: { username, password: token },
+        channels: [channel]
+      });
+
+      state.client.on('connected', () => {
+        state.connected = true;
+        updateStatus(`Connecté au chat de #${channel}`, true);
+      });
+
+      state.client.on('disconnected', () => {
+        state.connected = false;
+        updateStatus('Déconnecté');
+      });
+
+      state.client.on('message', (_channel, tags, message, self) => {
+        if (self) return;
+        const guess = parseGuess(message);
+        if (guess === null) return;
+        registerGuess(tags['display-name'] || tags.username, guess);
+      });
+
+      state.client.connect().catch((err) => {
+        console.error(err);
+        updateStatus('Échec de connexion : ' + err.message);
+      });
+    }
+
+    function disconnect() {
+      if (state.client) {
+        state.client.disconnect();
+      }
+      state.client = null;
+      state.connected = false;
+      updateStatus('Déconnecté');
+    }
+
+    function parseGuess(message) {
+      const trimmed = message.trim();
+      if (!trimmed.startsWith('!')) return null;
+      const value = trimmed.slice(1).replace(',', '.');
+      const number = Number(value);
+      if (!Number.isFinite(number)) return null;
+      const rounded = Math.round(number);
+      if (rounded < 0 || rounded > 100) return null;
+      return rounded;
+    }
+
+    function registerGuess(user, value) {
+      state.guesses.set(user.toLowerCase(), { user, value, time: new Date() });
+      selectors.lastVote.textContent = `${user} → ${value}`;
+      refreshMetrics();
+      addLogEntry(`${user} : ${value}`);
+    }
+
+    function refreshMetrics() {
+      const entries = Array.from(state.guesses.values());
+      selectors.voterCount.textContent = entries.length.toString();
+      if (!entries.length) {
+        selectors.liveAverage.textContent = '--';
+        selectors.averageValue.textContent = '--';
+        selectors.gaugeFill.style.width = '0%';
+        return;
+      }
+      const average = entries.reduce((acc, item) => acc + item.value, 0) / entries.length;
+      const formatted = average.toFixed(1);
+      selectors.liveAverage.textContent = formatted;
+      selectors.averageValue.textContent = formatted;
+      selectors.gaugeFill.style.width = `${Math.min(Math.max(average, 0), 100)}%`;
+    }
+
+    function addLogEntry(text) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = text;
+      selectors.voteLog.prepend(entry);
+      while (selectors.voteLog.children.length > 50) {
+        selectors.voteLog.removeChild(selectors.voteLog.lastChild);
+      }
+    }
+
+    function generateTarget() {
+      state.target = Math.floor(Math.random() * 101);
+      selectors.targetValue.textContent = state.target.toString().padStart(2, '0');
+      selectors.secretMask.classList.remove('hidden');
+      selectors.revealPanel.classList.add('hidden');
+      selectors.finalAverage.textContent = '--';
+      selectors.finalTarget.textContent = '--';
+      selectors.difference.textContent = '--';
+    }
+
+    function toggleMask() {
+      selectors.secretMask.classList.toggle('hidden');
+    }
+
+    function resetRound() {
+      state.guesses.clear();
+      selectors.voteLog.innerHTML = '';
+      selectors.lastVote.textContent = '--';
+      selectors.voterCount.textContent = '0';
+      selectors.gaugeFill.style.width = '0%';
+      selectors.averageValue.textContent = '--';
+      selectors.liveAverage.textContent = '--';
+      selectors.revealPanel.classList.add('hidden');
+    }
+
+    function reveal() {
+      if (state.target === null) {
+        alert('Générez une valeur cible avant de révéler.');
+        return;
+      }
+      const entries = Array.from(state.guesses.values());
+      if (!entries.length) {
+        alert('Aucune participation du chat pour ce tour.');
+        return;
+      }
+      const average = entries.reduce((acc, item) => acc + item.value, 0) / entries.length;
+      const diff = Math.abs(average - state.target);
+      selectors.finalAverage.textContent = average.toFixed(1);
+      selectors.finalTarget.textContent = state.target.toString();
+      selectors.difference.textContent = diff.toFixed(1);
+      selectors.revealPanel.classList.remove('hidden');
+    }
+
+    function syncExtremes() {
+      selectors.extremeLeftLabel.textContent = selectors.leftExtreme.value || 'Extrême gauche';
+      selectors.extremeRightLabel.textContent = selectors.rightExtreme.value || 'Extrême droite';
+    }
+
+    selectors.connectBtn.addEventListener('click', connect);
+    selectors.disconnectBtn.addEventListener('click', disconnect);
+    selectors.generateBtn.addEventListener('click', generateTarget);
+    selectors.toggleMaskBtn.addEventListener('click', toggleMask);
+    selectors.resetRoundBtn.addEventListener('click', resetRound);
+    selectors.revealBtn.addEventListener('click', reveal);
+    selectors.leftExtreme.addEventListener('input', syncExtremes);
+    selectors.rightExtreme.addEventListener('input', syncExtremes);
+
+    updateStatus('Non connecté');
+    syncExtremes();
+  </script>
+</body>
+</html>
