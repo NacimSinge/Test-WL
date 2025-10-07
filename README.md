@@ -1,60 +1,82 @@
-# Wavelength Live pour Twitch
+# Wavelength Live pour Twitch (aucun code requis)
 
-Cette mini-application 100% gratuite vous permet de jouer à une version "chat" du jeu Wavelength directement sur votre stream Twitch. Elle fonctionne dans n'importe quel navigateur moderne sans installation logicielle : il suffit d'ouvrir `index.html` en local (dans OBS vous pouvez ajouter la page comme "Browser Source").
+Cette page web vous permet de recréer gratuitement le jeu **Wavelength** avec votre chat Twitch. Tout se passe dans votre navigateur : pas besoin de connaître le code, GitHub ou d’installer un programme. Vous allez simplement télécharger un fichier et l’ouvrir.
 
-## Fonctionnalités principales
+## Ce dont vous avez besoin
 
-- Connexion directe au chat Twitch via [`tmi.js`](https://tmijs.com/).
-- Génération aléatoire d'une valeur secrète (0 à 100) cachée par défaut pour ne pas spoiler les viewers.
-- Champ personnalisable pour les deux extrêmes de la manche.
-- Lecture en temps réel des commandes `!nombre` envoyées par le chat.
-- Calcul automatique de la moyenne des votes uniques du chat et suivi du dernier vote reçu.
-- Bouton de révélation qui affiche la moyenne finale, la cible et l'écart.
+- Un ordinateur (Windows ou Mac) utilisé pour streamer.
+- Une connexion internet pour accéder au chat Twitch.
+- Un navigateur moderne déjà installé (Chrome, Edge, Firefox, etc.).
+- (Facultatif) OBS ou un logiciel de streaming si vous voulez afficher le jeu à l’écran.
+- Votre chaîne Twitch et, si vous le souhaitez, un compte bot secondaire.
 
-## Mise en route (moins de 10 minutes)
+## Étape 1 – Télécharger le fichier du jeu
 
-1. **Téléchargez le dépôt** ou copiez simplement le fichier `index.html` sur votre ordinateur de streaming.
-2. **Ouvrez le fichier** dans votre navigateur (clic droit → ouvrir avec Chrome/Edge/Firefox). Pour l'afficher sur OBS, ajoutez-le comme *Browser Source* en pointant vers `file:///…/index.html`.
-3. **Configurez la connexion au chat** :
-   - *Chaîne Twitch* : le nom de votre chaîne sans le `#` (obligatoire).
-   - *Pseudo Twitch du bot* : laissez vide si vous ne faites que lire le chat. Remplissez-le si vous disposez d’un compte bot dédié.
-   - *Jeton OAuth* : laissez vide pour une connexion anonyme (lecture seule). Si vous renseignez un pseudo bot, ajoutez également son jeton OAuth.
-4. Cliquez sur **Connexion**. Le statut passera en vert (`Connecté au chat`) une fois la connexion établie.
+1. Ouvrez la page GitHub du projet (l’adresse où vous lisez ce guide) et cliquez sur le bouton vert **Code** en haut à droite de la liste des fichiers.
+2. Choisissez **Download ZIP** (Télécharger ZIP). Un fichier compressé va se télécharger sur votre ordinateur.
+3. Ouvrez le fichier ZIP (double-cliquez dessus). Si une fenêtre vous propose *Extraire tout*, acceptez, puis faites glisser le fichier **`index.html`** vers un dossier facile à retrouver (par exemple le Bureau).
 
-> 💡 Pour plus de sécurité, créez un compte Twitch secondaire dédié au bot si vous souhaitez envoyer des messages automatisés.
+> 💡 Vous n’avez besoin que de ce fichier `index.html`. Une fois qu’il est sur votre ordinateur, vous pouvez fermer l’onglet GitHub : tout se lance localement dans votre navigateur.
 
-### Générer un jeton OAuth (optionnel)
+## Étape 2 – Ouvrir le jeu
 
-L’application peut lire le chat Twitch en mode anonyme, ce qui suffit pour la majorité des usages. Vous n’avez donc pas besoin de token tant que vous n’envoyez pas de messages via le bot.
+1. Localisez le fichier `index.html` sur votre ordinateur.
+2. Double-cliquez dessus : il s’ouvrira automatiquement dans votre navigateur.
+3. Vous voyez maintenant l’interface du jeu prête à être configurée.
 
-Si vous voulez tout de même authentifier un compte bot, deux possibilités :
+### L’intégrer à OBS (facultatif)
 
-1. **Méthode officielle Twitch** (recommandée par la documentation) :
-   - Créez une application sur <https://dev.twitch.tv/console/apps> et notez le `Client ID` et le `Client Secret`.
-   - Ajoutez `http://localhost` dans la liste des *Redirect URIs*.
-   - Suivez le guide <https://dev.twitch.tv/docs/irc/authenticate-bot/> pour obtenir un token `chat:read chat:edit` et copiez la valeur qui commence par `oauth:`.
-2. **Générateur communautaire maintenu** : <https://twitchtokengenerator.com/quick/tmi> propose une interface simplifiée pour générer un token `chat:read`/`chat:edit`. Connectez-vous avec le compte bot, copiez le token (préfixe `oauth:`) et collez-le dans le champ prévu.
+1. Ouvrez OBS.
+2. Dans la scène de votre choix, cliquez sur le bouton **+** de la liste *Sources*.
+3. Choisissez **Source navigateur** (Browser Source).
+4. Dans le champ *URL*, tapez `file:///` puis collez le chemin complet vers `index.html`. Le plus simple : cliquez sur **Parcourir** (Browse) et sélectionnez le fichier.
+5. Validez : l’interface du jeu s’affiche dans OBS.
 
-> ℹ️ Quel que soit le procédé utilisé, traitez votre token comme un mot de passe : ne le partagez pas et régénérez-le en cas de doute.
+## Étape 3 – Connecter le chat Twitch
 
-## Jouer une manche
+Dans la partie gauche de l’interface :
 
-1. Saisissez les deux extrêmes (0 = gauche, 100 = droite).
-2. Cliquez sur **Générer une valeur** : la cible aléatoire apparaît dans le cartouche secret.
-3. Masquez la valeur (`Afficher / Masquer`) avant de remettre la scène sur votre stream.
-4. Lancez le chrono oralement et demandez au chat d'envoyer `!0` à `!100`.
-5. Observez la moyenne en direct, le nombre de votants et le dernier vote.
-6. Quand le temps est écoulé, cliquez sur **Révéler la cible & l'écart** pour afficher le résultat final.
-7. Cliquez sur **Réinitialiser les votes** pour préparer le tour suivant.
+1. **Chaîne Twitch** : écrivez simplement le nom de votre chaîne (sans `#`). Exemple : `monstream`.
+2. **Pseudo Twitch du bot** :
+   - Laissez ce champ vide si vous ne faites que lire les messages du chat (c’est le cas le plus simple).
+   - Remplissez-le avec un compte bot si vous voulez que le jeu envoie des messages automatiques.
+3. **Jeton OAuth** :
+   - Laissez vide si vous êtes en mode lecture seule (connexion anonyme autorisée par Twitch).
+   - Remplissez-le uniquement si vous avez indiqué un compte bot et disposez de son jeton.
+4. Cliquez sur **Connexion**. Le voyant passe au vert avec le texte `Connecté au chat`.
 
-## Bonnes pratiques
+> ❗ Si le voyant reste rouge : vérifiez l’orthographe de votre chaîne ou relancez votre navigateur.
 
-- Seul le dernier vote d'un viewer est conservé pour éviter le spam : le bot met automatiquement la moyenne à jour.
-- L'interface ne stocke rien sur un serveur : toutes les données restent dans votre navigateur.
-- Si la connexion au chat tombe, appuyez sur **Déconnexion** puis **Connexion**.
+## Étape 4 – Jouer une manche
 
-## Personnalisation
+1. Indiquez les deux extrêmes (ex. `0 = Froid`, `100 = Chaud`).
+2. Cliquez sur **Générer une valeur** : une valeur secrète apparaît dans le panneau bleu.
+3. Masquez la valeur (bouton **Afficher / Masquer**) avant de retourner sur la scène en direct.
+4. Expliquez au chat qu’il doit taper `!` suivi d’un nombre (exemple `!42`).
+5. Les votes apparaissent automatiquement : suivez la moyenne, le nombre de votants et le dernier message reçu.
+6. Quand vous le souhaitez, cliquez sur **Révéler la cible & l'écart** pour montrer la valeur exacte et la moyenne du chat.
+7. Cliquez sur **Réinitialiser les votes** pour passer au tour suivant.
 
-Le fichier est autonome : vous pouvez ajuster les couleurs ou les textes directement dans `index.html`. Pour toute modification, gardez la structure HTML/JS existante afin de ne pas casser la connexion au chat.
+## (Optionnel) Obtenir un jeton OAuth pour un bot
+
+Vous n’en avez pas besoin pour lire le chat. Si vous souhaitez qu’un compte bot envoie des messages, créez un compte Twitch secondaire et suivez l’une des méthodes suivantes :
+
+1. **Méthode officielle Twitch** (plus technique) : guide complet ici <https://dev.twitch.tv/docs/irc/authenticate-bot/>.
+2. **Générateur simple** : <https://twitchtokengenerator.com/quick/tmi> (sélectionnez les permissions `chat:read` et `chat:edit`).
+
+Dans les deux cas, copiez la chaîne de caractères qui commence par `oauth:` et collez-la dans le champ *Jeton OAuth*.
+
+> Gardez ce jeton secret : il donne accès au compte bot.
+
+## Résolution de problèmes courants
+
+- **Rien ne s’affiche dans OBS** : vérifiez que l’URL pointe bien vers le fichier `index.html` (avec `file:///`).
+- **Le statut reste déconnecté** : assurez-vous que votre chaîne Twitch est correctement orthographiée et que vous avez cliqué sur **Connexion**.
+- **Les votes ne bougent pas** : rappelez au chat de taper un `!` avant le nombre (`!50`, `!73`, etc.).
+- **Vous avez changé de scène et perdu la connexion** : cliquez sur **Déconnexion** puis **Connexion** pour relancer.
+
+## Personnaliser le visuel (facultatif)
+
+Si vous vous sentez à l’aise, vous pouvez ouvrir `index.html` avec un éditeur de texte (Bloc-notes, VS Code) pour changer les couleurs ou les textes. Ne modifiez pas le reste du fichier si vous n’êtes pas sûr de ce que vous faites.
 
 Bon stream et amusez-vous bien avec votre version Live de Wavelength !
